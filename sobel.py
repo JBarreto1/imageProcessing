@@ -14,19 +14,31 @@ import kernelAdjust as ka
 def edge(imArray):
     """blur the image according to a gaussian kernel"""
     s = (len(imArray),len(imArray[0]))
+    s1 = (len(imArray),len(imArray[0]),3)
     newImageX = np.zeros(s)
     newImageY = np.zeros(s)
-    newImage = np.zeros(s)
+    newImage = np.zeros(s1)
     kernelX = [[-1,0,1],[-2,0,2],[-1,0,1]]
     kernelY = [[-1,-2,-1],[0,0,0],[1,2,1]]
     totalKernel = 1 # sum this for gaussian, but the sum for sobel operator would be zero (divide by this later)
     color = False
+    maxRadian = np.arctan(1)
     for i in range(0,len(imArray)):
         for j in range(0,len(imArray[0])):
             newImageX[i][j] = ka.blurPixel(i,j,imArray,kernelX,totalKernel,color)
             newImageY[i][j] = ka.blurPixel(i,j,imArray,kernelY,totalKernel,color)
             result = np.sqrt(np.square(newImageX[i][j]) + np.square(newImageY[i][j]))
-            newImage[i][j] = np.interp(result, (0, 1442), (0, 255)) #if there's a full black to white edge the max kernel result is sqrt(2* (4*255)^2)
+            newImage[i][j][0] = np.interp(result, (0, 1442), (0, 255)) #if there's a full black to white edge the max kernel result is sqrt(2* (4*255)^2)
+            gx = int(newImageX[i][j])
+            gy = int(newImageY[i][j])
+            if gx == 0:
+                gx = 1
+            tangent = gy/gx
+            tanInterp = np.interp(tangent, (0, 1020), (0, 1))
+            angle = np.arctan(tanInterp)
+            angleInterp = int(np.interp(angle, (0, maxRadian), (0, 255)))
+            newImage[i][j][1] = angleInterp
+            newImage[i][j][2] = angleInterp
     # both = [newImage,newImageX,newImageY]
     return newImage
 

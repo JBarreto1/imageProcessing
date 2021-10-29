@@ -1,5 +1,6 @@
 import csv
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
 def initParams():
@@ -90,23 +91,6 @@ def grad_descent(m,X,Y,w1,b1,w2,b2,w3,b3,alpha):
     acc = accuracy(predictions,Y)
     return w1,b1,w2,b2,w3,b3,acc
 
-def readData(dataLoc):
-    data = []
-    with open(dataLoc) as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        _ = next(csv_reader) #strip the first row because its just the header/names of columns
-        # np.random.shuffle(X) Might want to shuffle later on for better results
-        for row in csv_reader:
-            # target = int(row[0]) #first item in the row is the target
-            # data.append([target])
-            # imgTuple = (int(row[0]),int(row[1:])/255)
-            # pixels = row[1:]
-            # # pixels = [data[-1].append((int(i)/255)) for i in pixels]
-            pixels = [int(i) for i in row]
-            data.append(pixels)
-            # X.append(pixels)
-    return data
-
 def testModel(data,w1,b1,w2,b2,w3,b3):
     nCorrect = 0
     nIncorrect = 0
@@ -124,15 +108,17 @@ def testModel(data,w1,b1,w2,b2,w3,b3):
 def main(alpha,iterations,batchSize):
     w1,b1,w2,b2,w3,b3 = initParams()
     accList = []
-    data = readData('../train.csv')
+    data = pd.read_csv('../miniTest.csv', sep=',')
     allData = np.array(data)
     data = allData[0:30000]
     for j in range(iterations):
         np.random.shuffle(data)
-        dataTrans = data.T
-        X = np.array(dataTrans[1:])
-        Y = np.array(dataTrans[0])
-        X = X.T
+        # dataTrans = data.T
+        # X = np.array(dataTrans[1:])
+        # Y = np.array(dataTrans[0])
+        X = np.array(data[:,1:30000])
+        Y = np.array(data[:,0])
+        # X = X.T
         X = X / 255
         m, n = X.shape
         if j % 10:
